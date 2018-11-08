@@ -1,6 +1,7 @@
 # Self-Balancing-Robot
 This is the arduino code for my Self-Balancing Robot Project.
-Project Page: https://swapneelnaphade.tech/projects/self-balancing-robot
+
+For Hardware configuration and Parts List visit the project page: https://swapneelnaphade.tech/projects/self-balancing-robot
 
 Requires including the following libraries:
 1. "I2Cdev.h"                      (Thanks to @jrowberg: https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/I2Cdev/I2Cdev.h)
