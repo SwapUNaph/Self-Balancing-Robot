@@ -4,11 +4,12 @@
 #include "I2Cdev.h"                       //Thanks to @jrowberg: https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/I2Cdev/I2Cdev.h
 #include "MPU6050_6Axis_MotionApps20.h"  //Thanks to @jrowberg: https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050 
 
-//*************************PID library********************************************************************
+//*************************PID Setup********************************************************************
 #include <PID_v1.h>       //Thanks to @br3ttb:  https://github.com/br3ttb/Arduino-PID-Library/blob/master/PID_v1.h
 
 #define PIN_INPUT 0
-//Define Variables we'll be connecting to
+
+//Controller Variables
 double Setpoint, Input, Output;
 
 //Specify the links and initial tuning parameters
@@ -20,17 +21,24 @@ PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 //******************************************************************************************************
 
 //*******************************Motor_setup***********************************************************
+//Define motor position and direction
 boolean LEFT=0;
 boolean RIGHT=1;
 boolean BACKWARD=0;
 boolean FORWARD=1;
+
+//Define Motor pins
 uint8_t leftMotorHigh=9;
 uint8_t leftMotorLow=10;
 uint8_t rightMotorHigh=11;
 uint8_t rightMotorLow=12;
+
+//Define Motor Speed pins (PWM pins)
 uint8_t leftMotorSpeed=6;
 uint8_t rightMotorSpeed=5;
-int motorSpeed=0;
+int motorSpeed=0; 
+
+//Moves bot in direction dir with velocity specified
 void moveBot(boolean dir, int velocity){
     analogWrite(leftMotorSpeed, velocity);
     analogWrite(rightMotorSpeed, velocity);
@@ -38,6 +46,7 @@ void moveBot(boolean dir, int velocity){
     rotateMotor(RIGHT,dir);
 }
 
+//Rotates the num (left/right) motor in dir direction
 void rotateMotor(uint8_t num, boolean dir){
   if(num==LEFT){
       digitalWrite(leftMotorHigh,dir);
@@ -49,7 +58,7 @@ void rotateMotor(uint8_t num, boolean dir){
   }
  } 
 
-//********************************************************************************************************
+//******************************************** MPU 6050 setup *********************************************
 //#include "MPU6050.h" // not necessary if using MotionApps include file
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -307,12 +316,13 @@ void loop() {
         
         Input= (int)(ypr[1] * 180/M_PI);
         
-        //Read tuning parameters from potentiometers
+        //Read tuning parameters from potentiometers at A1, A2, A3 pins
         double potKp=analogRead(A2)/30.0;
         double potKi=analogRead(A1)/30.0;
         double potKd=analogRead(A3)/30.0;
         int deadBand=35;
         
+        //Print Angle and current tuning parameters
         Serial.print("Angle\t");
         Serial.print(Input);
         Serial.print("\t");
@@ -328,6 +338,7 @@ void loop() {
         //Set tuning parameters
         myPID.SetTunings(potKp,potKi,potKd);
         
+        //Compute and apply PID control
         myPID.Compute();
         motorSpeed=map(Output,0,255,-255,255);
         if(motorSpeed>0 && motorSpeed<deadBand)
@@ -338,6 +349,7 @@ void loop() {
           moveBot(FORWARD,abs(motorSpeed));
         else moveBot(BACKWARD,abs(motorSpeed));
 
+        //Print Calculated Motor speed
         Serial.print("\t");
         Serial.print(';');
         Serial.print("\t");
