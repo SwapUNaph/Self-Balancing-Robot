@@ -1,4 +1,4 @@
-//Self-Balancing Robot: https://swapneelnaphade.tech/projects/self-balancing-robot
+//Self-Balancing Robot: https://swapneelnaphade.site/projects/self-balancing-robot
 //Author: Swapneel Naphade
 
 #include "I2Cdev.h"                       //Thanks to @jrowberg: https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/I2Cdev/I2Cdev.h
